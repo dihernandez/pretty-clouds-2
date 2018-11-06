@@ -9,8 +9,7 @@ import imgurpython as imgP
 
 client_id = 'eaa798b45a9adeb'
 client_secret = 'a788992ea533c67d9a2d75921aa39148e39c9c29'
-gallery_url = 'https://imgur.com/search?q=clouds'
-gallery_key = "GALLERY" 
+cloud_gallery_key = 'https://imgur.com/search?q=clouds'
 client = imgP.ImgurClient(client_id, client_secret)
 
 # Example request
@@ -38,31 +37,16 @@ class ImageStream:
     		'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36',
 		})
 
-		page = requests.get(gallery_url)
-		content = BeautifulSoup(page.content)
-		thumbnail_container = content.select('a.thumbnail')		
+		page = requests.get(cloud_gallery_key)
+		content = BeautifulSoup(page.content, features="html.parser")
+		url_container = content.select('img')
 
-		for reference in thumbnail_container:
-			extracted_url = reference['href']
-			self.image_urls.append(extracted_url)
+		for reference in url_container:
+			extracted_url = reference['src']
+			if "gif" not in extracted_url:
+				self.image_urls.append(extracted_url)
+				print(extracted_url)
 		return self.image_urls
-
-
-	''' extract urls from imgur gallery 
-		adapted from Tankor Smash's Blog post http://blog.tankorsmash.com/?p=266
-	'''
-	def getImageLinksFromImgurGallery(self):
-		IMAGE_NAME_KEY = 'hash'		
-		IMAGE_EXTENSION_KEY = 'ext'
-		BASE_URL = r'http://imgur.com/{name}{ext}'
-		image_list = self.page_json[GALLERY_KEY]
-		
-		for image in image_list:
-			image_name = image[IMAGE_NAME_KEY]
-			image_ext = image[IMAGE_EXTENSION_KEY]
-			image_url = BASE_URL.format(name=name, ext=ext)
-			self.image_urls.append(image_url)
-		return copy.copy(self.image_urls)
 
 	def populateQueue(self, image_url):
 		try:

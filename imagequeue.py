@@ -1,4 +1,4 @@
-from urllib.request import urlopen
+import urllib.request
 
 #may only load one image at a time
 class ImageQueue:
@@ -17,7 +17,10 @@ class ImageQueue:
 		if (not self.isPopulated):
 			self.content = image_url
 			image_holder = open("image_holder.jpg",'w')
-			image_holder.write(urlopen(image_url).read())
+			print(image_url)
+			image_data = urllib.request.urlopen("http://"+image_url[4:])
+			print(image_url, "  ", image_data)
+			image_holder.write(image_data.read())
 			image_holder.close()
 			self.isPopulated = True
 		else:
