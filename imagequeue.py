@@ -16,10 +16,10 @@ class ImageQueue:
 	def pushImage(self, image_url):
 		if (not self.isPopulated):
 			self.content = image_url
-			image_holder = open("image_holder.jpg",'w')
-			print(image_url)
+			image_holder = open("image_holder.jpg",'wb')
+			#print(image_url)
 			image_data = urllib.request.urlopen("http://"+image_url[4:])
-			print(image_url, "  ", image_data)
+			#print(image_url, "  ", image_data)
 			image_holder.write(image_data.read())
 			image_holder.close()
 			self.isPopulated = True

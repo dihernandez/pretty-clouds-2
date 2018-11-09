@@ -45,7 +45,6 @@ class ImageStream:
 			extracted_url = reference['src']
 			if "gif" not in extracted_url:
 				self.image_urls.append(extracted_url)
-				print(extracted_url)
 		return self.image_urls
 
 	def populateQueue(self, image_url):

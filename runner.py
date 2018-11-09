@@ -21,8 +21,8 @@ class Runner:
 			return self.images_to_process.pop()		
 
 		def callAnalyzer():
-			#analyzer = subprocess.Popen("pictureAnalyzerMain.cpp", 1024)
 			analyzer = subprocess.Popen('./pictureAnalyzerMain.out', shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+			print(analyzer.stdout.read())
 			analyzer.wait()
 
 		while (self.images_to_process):
