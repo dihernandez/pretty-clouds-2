@@ -1,27 +1,25 @@
-// #include <stdio.h> 
-
-// int main(int argc, char* argv[]) {
-
-// 	printf("there shall be pictures. \n");
-
-// 	return 0;
-// }
-
+#include <stdlib.h> 
 #include <stdio.h>
+#include <unistd.h>
 #include <opencv2/opencv.hpp>
 using namespace cv;
 
 int main(int argc, char** argv )
 {
     Mat image;
-    image = imread("image_holder.jpg", 1 );
+    unsigned int microseconds = 1000000;
+    printf("before imread");
+    image = imread("image_holder.jpg", 1);
+    printf("after imread \n");
      if ( !image.data )
     {
         printf("No image data \n");
         return -1;
     }
-    namedWindow("Display Image", WINDOW_AUTOSIZE );
+    printf("befoe namedWindow\n");
+    namedWindow("Display Image", WINDOW_AUTOSIZE);
     imshow("Display Image", image);
-    waitKey(0);
+    waitKey(1000);
+    destroyAllWindows();
     return 0;
 }
