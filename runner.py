@@ -1,5 +1,7 @@
 import subprocess
 import get_images
+import cv2
+import numpy
 
 ''' here I will call the scraper (pull highly ranked pics with keyword cloud from imgur)
 	and pass on to initialize metadata assignments
@@ -8,10 +10,46 @@ import get_images
 	The scraper/learning stuff will run depending on a switch (boolean var)
 	afterwards output will generate image
 '''
+
+def resizePicture():
+	img = cv2.imread('image_holder.jpg', cv2.IMREAD_UNCHANGED)
+	 
+	print('Original Dimensions : ',img.shape)
+	 
+	dim = (600, 400)
+	# resize image
+	resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+	 
+	print('Resized Dimensions : ',resized.shape)
+	 
+	cv2.imshow("Resized image", resized)
+	cv2.waitKey(1000)
+	cv2.destroyAllWindows()
+	return resized
+
+
+
 class Runner:
-	def __init__(self):
+	def __init__(self, WIDTH = 600, HEIGHT = 400):
 		self.image_stream = get_images.ImageStream()
 		self.images_to_process = self.image_stream.getImageLinks()
+		self.WIDTH = 600
+		self.HEIGHT = 400
+		self.num_pixels = self.WIDTH * self.HEIGHT
+		self.output = numpy.zeros([self.HEIGHT, self.WIDTH, 3])
+
+
+	def extractColor(self, img):
+		for w in range(self.WIDTH - 1):
+			for h in range(self.HEIGHT - 1):
+				self.output[h, w, 0] += img[h, w, 0]
+				self.output[h, w, 1] += img[h, w, 1]
+				self.output[h, w, 2] += img[h, w, 2]
+
+	def averageOutput(self):
+		for w in range(self.WIDTH - 1):
+			for h in range(self.HEIGHT - 1):
+				self.output[h, w, 0] = self.output[h, w, 0]/self.num_pixels
 
 	def trainingMain(self):
 		def retrieveNextImage():
@@ -20,24 +58,24 @@ class Runner:
 				self.images_to_process = self.image_stream.getImageLinks()
 			return self.images_to_process.pop()		
 
-		def callAnalyzer():
-			analyzer = subprocess.Popen('./pictureAnalyzerMain', shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-			print(analyzer.stdout.read())
-			analyzer.wait()
+		# def callAnalyzer():
+		# 	analyzer = subprocess.Popen('./pictureAnalyzerMain.py', shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+		# 	print(analyzer.stdout.read())
+		# 	analyzer.wait()
 
-		while (self.images_to_process):
+
+		max_images=2
+		image_cnt=0
+		while (self.images_to_process and image_cnt<max_images):
 			next_image = retrieveNextImage()
 			self.image_stream.populateQueue(next_image)
-			callAnalyzer()
+			img = resizePicture()
+			print(img.shape[:2])
+			self.extractColor(img)
+			self.averageOutput()
+			image_cnt+=1
+			cv2.imwrite("image_output.jpg", self.output)
 
-		
-
-''' Dummy function for now, but will eventually
-	check if n images have been checked,
-	n is my goal sample size and decided by me
-'''
-def proccessComplete():
-	return True
 
 runner = Runner()
 runner.trainingMain()

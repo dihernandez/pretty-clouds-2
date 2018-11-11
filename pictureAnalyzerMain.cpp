@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
+#include <mat.hpp>
 using namespace cv;
 
 int main(int argc, char** argv )
@@ -23,3 +24,4 @@ int main(int argc, char** argv )
     destroyAllWindows();
     return 0;
 }
+
