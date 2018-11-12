@@ -35,21 +35,26 @@ class Runner:
 		self.images_to_process = self.image_stream.getImageLinks()
 		self.WIDTH = 600
 		self.HEIGHT = 400
+		self.num_picutres_analyzed = 0
 		self.num_pixels = self.WIDTH * self.HEIGHT
 		self.output = numpy.zeros([self.HEIGHT, self.WIDTH, 3])
 
 
 	def extractColor(self, img):
+		self.num_picutres_analyzed += 1
+
 		for w in range(self.WIDTH - 1):
 			for h in range(self.HEIGHT - 1):
 				self.output[h, w, 0] += img[h, w, 0]
 				self.output[h, w, 1] += img[h, w, 1]
 				self.output[h, w, 2] += img[h, w, 2]
-
+	
 	def averageOutput(self):
 		for w in range(self.WIDTH - 1):
 			for h in range(self.HEIGHT - 1):
-				self.output[h, w, 0] = self.output[h, w, 0]/self.num_pixels
+				self.output[h, w, 0] = self.output[h, w, 0]/self.num_picutres_analyzed
+				self.output[h, w, 1] = self.output[h, w, 1]/self.num_picutres_analyzed
+				self.output[h, w, 2] = self.output[h, w, 2]/self.num_picutres_analyzed
 
 	def trainingMain(self):
 		def retrieveNextImage():
@@ -70,11 +75,11 @@ class Runner:
 			next_image = retrieveNextImage()
 			self.image_stream.populateQueue(next_image)
 			img = resizePicture()
-			print(img.shape[:2])
 			self.extractColor(img)
-			self.averageOutput()
 			image_cnt+=1
-			cv2.imwrite("image_output.jpg", self.output)
+
+		self.averageOutput()
+		cv2.imwrite("image_output.jpg", self.output)
 
 
 runner = Runner()
